@@ -21,6 +21,9 @@ class InterviewRequest(BaseModel):
     role: str
     experience: str
 
+class AnswerRequest(BaseModel):
+    answer: str
+
 questions = {
     "SDE": {
         "fresher": [
@@ -82,3 +85,36 @@ def get_question(data: InterviewRequest):
     question = random.choice(questions[role][level])
 
     return {"question": question}
+
+@app.post("/evaluate")
+def evaluate(data: AnswerRequest):
+    answer = data.answer.lower()
+
+    score = 0
+    feedback = ""
+
+    # Length check
+    if len(answer) < 20:
+        feedback = "Answer too short. Try to elaborate."
+        score = 2
+    elif len(answer) < 50:
+        feedback = "Decent answer but needs more depth."
+        score = 5
+    else:
+        feedback = "Good detailed answer."
+        score = 8
+
+    # Keyword bonus
+    keywords = ["data", "structure", "algorithm", "process"]
+
+    keyword_count = sum(1 for word in keywords if word in answer)
+
+    score += keyword_count
+
+    if score > 10:
+        score = 10
+
+    return {
+        "score": score,
+        "feedback": feedback
+    }
