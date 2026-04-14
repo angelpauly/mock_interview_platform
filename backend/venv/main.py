@@ -20,6 +20,7 @@ app.add_middleware(
 class InterviewRequest(BaseModel):
     role: str
     experience: str
+    previous_questions: list[str] = []
 
 class AnswerRequest(BaseModel):
     answer: str
@@ -70,6 +71,7 @@ questions = {
 def get_question(data: InterviewRequest):
     role = data.role
     experience = data.experience.lower()
+    previous = data.previous_questions
 
     # Decide level based on experience
     if "0" in experience or "fresher" in experience:
@@ -81,8 +83,14 @@ def get_question(data: InterviewRequest):
     if role not in questions:
         return {"question": "Invalid role selected"}
 
-    # Pick random question
-    question = random.choice(questions[role][level])
+    available_questions=[
+        q for q in questions[role][level] if q not in previous
+    ]
+
+    if not available_questions:
+        return{"question": "Interview Completed"}
+    
+    question = random.choice(available_questions)
 
     return {"question": question}
 
