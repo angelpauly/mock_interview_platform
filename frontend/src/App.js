@@ -11,6 +11,9 @@ function App() {
   const [previousQuestions, setPreviousQuestions] = useState([]);
   const [session, setSession] = useState([]);
 
+  const [timeLeft, setTimeLeft] = useState(60); // 60 seconds
+  const [timerActive, setTimerActive] = useState(false);
+
   const [started, setStarted] = useState(false);
 
   // 🔹 Start Interview
