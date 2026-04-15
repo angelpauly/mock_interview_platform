@@ -13,6 +13,7 @@ function App() {
 
   const [timeLeft, setTimeLeft] = useState(60); // 60 seconds
   const [timerActive, setTimerActive] = useState(false);
+  const [attempts, setAttempts] = useState(0);
 
   const [started, setStarted] = useState(false);
 
@@ -33,6 +34,7 @@ function App() {
     setFeedback("");
     setTimeLeft(60);
     setTimerActive(true);
+    setAttempts(0);
 
     const res = await fetch("http://127.0.0.1:8000/question", {
       method: "POST",
