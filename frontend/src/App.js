@@ -31,6 +31,8 @@ function App() {
     setAnswer("");
     setScore(null);
     setFeedback("");
+    setTimeLeft(60);
+    setTimerActive(true);
 
     const res = await fetch("http://127.0.0.1:8000/question", {
       method: "POST",
