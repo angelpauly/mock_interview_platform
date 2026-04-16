@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [role, setRole] = useState("");
@@ -11,7 +11,7 @@ function App() {
   const [previousQuestions, setPreviousQuestions] = useState([]);
   const [session, setSession] = useState([]);
 
-  const [timeLeft, setTimeLeft] = useState(60); // 60 seconds
+  const [timeLeft, setTimeLeft] = useState(60);
   const [timerActive, setTimerActive] = useState(false);
   const [attempts, setAttempts] = useState(0);
 
@@ -23,7 +23,6 @@ function App() {
       alert("Please select role and experience");
       return;
     }
-
     setStarted(true);
   };
 
@@ -32,8 +31,6 @@ function App() {
     setAnswer("");
     setScore(null);
     setFeedback("");
-    setTimeLeft(60);
-    setTimerActive(true);
     setAttempts(0);
 
     const res = await fetch("http://127.0.0.1:8000/question", {
@@ -57,14 +54,43 @@ function App() {
 
     setQuestion(data.question);
     setPreviousQuestions([...previousQuestions, data.question]);
+
+    // start timer AFTER question loads
+    setTimeLeft(60);
+    setTimerActive(true);
   };
 
-  // 🔹 Submit Answer
-  const submitAnswer = async () => {
+  // 🔹 Timer Logic
+  useEffect(() => {
+    if (!timerActive) return;
+
+    if (timeLeft === 0) {
+      setTimerActive(false);
+      alert("Time's up!");
+      handleSubmit(); // auto submit
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [timeLeft, timerActive]);
+
+  // 🔹 Submit / Retry Answer
+  const handleSubmit = async () => {
     if (!answer) {
       alert("Please enter an answer");
       return;
     }
+
+    if (attempts >= 2) {
+      alert("Maximum attempts reached!");
+      return;
+    }
+
+    setTimerActive(false);
 
     const res = await fetch("http://127.0.0.1:8000/evaluate", {
       method: "POST",
@@ -79,15 +105,19 @@ function App() {
 
     const data = await res.json();
 
+    const newAttempt = attempts + 1;
+    setAttempts(newAttempt);
+
     setScore(data.score);
     setFeedback(data.feedback);
 
     setSession([
       ...session,
       {
-        question: question,
-        answer: answer,
-        score: data.score
+        question,
+        answer,
+        score: data.score,
+        attempt: newAttempt
       }
     ]);
   };
@@ -137,6 +167,8 @@ function App() {
           {/* Question Section */}
           {question && (
             <>
+              <h3>Time Left: {timeLeft}s</h3>
+
               <h3>{question}</h3>
 
               <textarea
@@ -149,9 +181,19 @@ function App() {
 
               <br /><br />
 
-              <button onClick={submitAnswer}>
+              <button onClick={handleSubmit}>
                 Submit Answer
               </button>
+
+              {attempts < 2 && attempts > 0 && (
+                <button onClick={handleSubmit}>
+                  Retry Answer
+                </button>
+              )}
+
+              {attempts >= 2 && (
+                <p>Maximum attempts reached. Move to next question.</p>
+              )}
 
               <br /><br />
 
@@ -174,7 +216,8 @@ function App() {
             {session.map((item, index) => (
               <li key={index}>
                 <strong>Q:</strong> {item.question} <br />
-                <strong>Score:</strong> {item.score}
+                <strong>Score:</strong> {item.score} <br />
+                <strong>Attempt:</strong> {item.attempt}
               </li>
             ))}
           </ul>
