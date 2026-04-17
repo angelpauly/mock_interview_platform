@@ -16,6 +16,9 @@ function App() {
   const [attempts, setAttempts] = useState(0);
 
   const [started, setStarted] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+
+
 
   // 🔹 Start Interview
   const startInterview = () => {
@@ -32,6 +35,7 @@ function App() {
     setScore(null);
     setFeedback("");
     setAttempts(0);
+    setShowResult(false);
 
     const res = await fetch("http://127.0.0.1:8000/question", {
       method: "POST",
@@ -78,19 +82,29 @@ function App() {
     return () => clearTimeout(timer);
   }, [timeLeft, timerActive]);
 
-  // 🔹 Submit / Retry Answer
+  const handleRetry = () => {
+    if(attempts >=2) {
+      alert("Maximum attempts reached!");
+      return;
+    }
+
+    setAnswer("");
+    setScore(null);
+    setFeedback("");
+    setShowResult(false);
+    setTimerActive(true);
+    setTimeLeft(60);
+  };
+
+  // 🔹 Submit
   const handleSubmit = async () => {
     if (!answer) {
       alert("Please enter an answer");
       return;
     }
 
-    if (attempts >= 2) {
-      alert("Maximum attempts reached!");
-      return;
-    }
-
     setTimerActive(false);
+    setShowResult(true);
 
     const res = await fetch("http://127.0.0.1:8000/evaluate", {
       method: "POST",
