@@ -18,8 +18,6 @@ function App() {
   const [started, setStarted] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
-
-
   // 🔹 Start Interview
   const startInterview = () => {
     if (!role || !experience) {
@@ -59,7 +57,6 @@ function App() {
     setQuestion(data.question);
     setPreviousQuestions([...previousQuestions, data.question]);
 
-    // start timer AFTER question loads
     setTimeLeft(60);
     setTimerActive(true);
   };
@@ -71,7 +68,10 @@ function App() {
     if (timeLeft === 0) {
       setTimerActive(false);
       alert("Time's up!");
-      handleSubmit(); // auto submit
+
+      if (answer) {
+        handleSubmit();
+      }
       return;
     }
 
@@ -82,8 +82,9 @@ function App() {
     return () => clearTimeout(timer);
   }, [timeLeft, timerActive]);
 
+  // 🔹 Retry
   const handleRetry = () => {
-    if(attempts >=2) {
+    if (attempts >= 2) {
       alert("Maximum attempts reached!");
       return;
     }
@@ -92,14 +93,20 @@ function App() {
     setScore(null);
     setFeedback("");
     setShowResult(false);
-    setTimerActive(true);
+
     setTimeLeft(60);
+    setTimerActive(true);
   };
 
   // 🔹 Submit
   const handleSubmit = async () => {
     if (!answer) {
       alert("Please enter an answer");
+      return;
+    }
+
+    if (attempts >= 2) {
+      alert("Maximum attempts reached!");
       return;
     }
 
@@ -195,30 +202,38 @@ function App() {
 
               <br /><br />
 
-              <button onClick={handleSubmit}>
-                Submit Answer
-              </button>
-
-              {attempts < 2 && attempts > 0 && (
+              {!showResult && (
                 <button onClick={handleSubmit}>
-                  Retry Answer
+                  Submit Answer
                 </button>
               )}
 
-              {attempts >= 2 && (
-                <p>Maximum attempts reached. Move to next question.</p>
-              )}
-
-              <br /><br />
-
-              {score !== null && (
+              {showResult && (
                 <>
                   <h3>Score: {score}/10</h3>
                   <p>{feedback}</p>
 
-                  <button onClick={fetchQuestion}>
-                    Next Question
-                  </button>
+                  <br />
+
+                  {attempts < 2 ? (
+                    <>
+                      <button onClick={handleRetry}>
+                        Retry Answer
+                      </button>
+
+                      <button onClick={fetchQuestion}>
+                        Next Question
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p>Maximum attempts reached.</p>
+
+                      <button onClick={fetchQuestion}>
+                        Next Question
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </>
