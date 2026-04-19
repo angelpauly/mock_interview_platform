@@ -31,7 +31,9 @@ questions = {
             "What is a linked list?",
             "Explain stack vs queue.",
             "What is time complexity?",
-            "What is OOP?"
+            "What is OOP?",
+            "what is an algorithm?",
+            "what is meant by object oriented programming"
         ],
         "experienced": [
             "Explain how a hash table works internally.",
