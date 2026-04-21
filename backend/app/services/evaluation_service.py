@@ -1,30 +1,36 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+# Temporary ideal answers (later from DB)
+ideal_answers = {
+    "What is a linked list?": "A linked list is a linear data structure where elements are connected using pointers.",
+    "Explain stack vs queue.": "Stack follows LIFO while queue follows FIFO."
+}
+
+
 def evaluate_answer(question: str, answer: str):
     answer = answer.lower()
 
-    score = 0
-    feedback = []
+    ideal = ideal_answers.get(question, "")
 
-    # Length scoring
-    if len(answer) < 30:
-        score += 2
-        feedback.append("Answer is too short.")
-    elif len(answer) < 80:
-        score += 5
-        feedback.append("Decent answer.")
+    if not ideal:
+        return 5, "No reference answer available."
+
+    vectorizer = TfidfVectorizer()
+
+    vectors = vectorizer.fit_transform([answer, ideal])
+
+    similarity = cosine_similarity(vectors[0], vectors[1])[0][0]
+
+    score = int(similarity * 10)
+
+    # feedback logic
+    if score < 4:
+        feedback = "Your answer is not aligned with expected concepts."
+    elif score < 7:
+        feedback = "Decent answer but can be improved."
     else:
-        score += 8
-        feedback.append("Well detailed answer.")
+        feedback = "Good answer with strong relevance."
 
-    # Logic indicators
-    if "because" in answer or "therefore" in answer:
-        score += 1
-        feedback.append("Good explanation flow.")
-
-    if "example" in answer:
-        score += 1
-        feedback.append("Good use of examples.")
-
-    if score > 10:
-        score = 10
-
-    return score, " ".join(feedback)
+    return score, feedback
