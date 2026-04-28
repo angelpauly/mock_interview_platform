@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [showSignup, setShowSignup] = useState(false);
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
   const [question, setQuestion] = useState("");
@@ -17,6 +21,8 @@ function App() {
 
   const [started, setStarted] = useState(false);
   const [showResult, setShowResult] = useState(false);
+
+  
 
   // 🔹 Start Interview
   const startInterview = () => {
@@ -35,17 +41,21 @@ function App() {
     setAttempts(0);
     setShowResult(false);
 
-    const res = await fetch("http://127.0.0.1:8000/question", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        role,
-        experience,
-        previous_questions: previousQuestions
-      })
-    });
+    const token = localStorage.getItem("token");  // ✅ outside
+
+const res = await fetch("http://127.0.0.1:8000/question", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`  // ✅ correct
+  },
+  body: JSON.stringify({
+    role,
+    experience,
+    previous_questions: previousQuestions
+  })
+});
+    
 
     const data = await res.json();
 
@@ -142,6 +152,24 @@ function App() {
       }
     ]);
   };
+
+  if (!isLoggedIn) {
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      {showSignup ? (
+        <Signup />
+      ) : (
+        <Login setIsLoggedIn={setIsLoggedIn} />
+      )}
+
+      <br />
+
+      <button onClick={() => setShowSignup(!showSignup)}>
+        {showSignup ? "Go to Login" : "Go to Signup"}
+      </button>
+    </div>
+  );
+}
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
