@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import interview, evaluation
-from app.routes import auth
+from app.routes import auth, interview, evaluation
+
 
 app = FastAPI()
 
@@ -14,6 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(interview.router)
 app.include_router(evaluation.router)
-app.include_router(auth.router)
