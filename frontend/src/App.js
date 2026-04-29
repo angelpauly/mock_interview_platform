@@ -3,6 +3,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 
 function App() {
+  const [userEmail, setUserEmail] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 const [showSignup, setShowSignup] = useState(false);
   const [role, setRole] = useState("");
@@ -23,6 +24,16 @@ const [showSignup, setShowSignup] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
   
+
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    setUserEmail(payload.sub);
+    setIsLoggedIn(true);
+  }
+}, []);
 
   // 🔹 Start Interview
   const startInterview = () => {
@@ -153,6 +164,13 @@ const res = await fetch("http://127.0.0.1:8000/question", {
     ]);
   };
 
+  <button onClick={() => {
+  localStorage.removeItem("token");
+  window.location.reload();
+}}>
+  Logout
+</button>
+
   if (!isLoggedIn) {
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
@@ -167,7 +185,13 @@ const res = await fetch("http://127.0.0.1:8000/question", {
       <button onClick={() => setShowSignup(!showSignup)}>
         {showSignup ? "Go to Login" : "Go to Signup"}
       </button>
+
+      <h3>Welcome {userEmail}</h3>
+      
     </div>
+    
+
+    
   );
 }
 
