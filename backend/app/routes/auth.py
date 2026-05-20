@@ -1,36 +1,80 @@
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import UserSignup, UserLogin
-from app.services.auth_service import (
-    hash_password, verify_password, create_token, fake_users_db
+
+from app.models.schemas import (
+    UserSignup,
+    UserLogin
 )
+
+from app.services.auth_service import (
+    hash_password,
+    verify_password,
+    create_token
+)
+
+from app.core.database import users_collection
 
 router = APIRouter()
 
+
+# ✅ SIGNUP
 @router.post("/signup")
 def signup(user: UserSignup):
-    if user.email in fake_users_db:
-        raise HTTPException(status_code=400, detail="User already exists")
 
+    # Check if user already exists
+    existing_user = users_collection.find_one({
+        "email": user.email
+    })
+
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="User already exists"
+        )
+
+    # Hash password
     hashed = hash_password(user.password)
 
-    fake_users_db[user.email] = {
+    # Save user in MongoDB
+    users_collection.insert_one({
         "email": user.email,
         "password": hashed
+    })
+
+    return {
+        "message": "User created successfully"
     }
 
-    return {"message": "User created successfully"}
 
-
+# ✅ LOGIN
 @router.post("/login")
 def login(user: UserLogin):
-    db_user = fake_users_db.get(user.email)
+
+    # Find user in MongoDB
+    db_user = users_collection.find_one({
+        "email": user.email
+    })
 
     if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
-    if not verify_password(user.password, db_user["password"]):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    # Verify password
+    if not verify_password(
+        user.password,
+        db_user["password"]
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
 
-    token = create_token({"sub": user.email})
+    # Create JWT token
+    token = create_token({
+        "sub": user.email
+    })
 
-    return {"access_token": token}
+    return {
+        "access_token": token
+    }
