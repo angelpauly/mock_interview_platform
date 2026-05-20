@@ -1,38 +1,39 @@
 import random
 
-questions = {
-    "SDE": {
-        "fresher": [
-            "What is a linked list?",
-            "Explain stack vs queue.",
-            "What is time complexity?",
-            "What is OOP?"
-        ],
-        "experienced": [
-            "Explain how a hash table works.",
-            "What is multithreading?",
-            "Design a URL shortener."
-        ]
-    }
-}
+from app.core.database import questions_collection
+
 
 def get_level(experience: str):
-    if "0" in experience or "fresher" in experience.lower():
+
+    if (
+        "0" in experience
+        or "fresher" in experience.lower()
+    ):
         return "fresher"
+
     return "experienced"
 
 
 def fetch_question(role, experience, previous):
-    if role not in questions:
-        return "Invalid role selected"
 
     level = get_level(experience)
 
+    # Fetch questions from MongoDB
+    db_questions = list(
+        questions_collection.find({
+            "role": role,
+            "level": level
+        })
+    )
+
     available = [
-        q for q in questions[role][level] if q not in previous
+        q for q in db_questions
+        if q["question"] not in previous
     ]
 
     if not available:
-        return "Interview Completed"
+        return "Interview completed"
 
-    return random.choice(available)
+    selected = random.choice(available)
+
+    return selected["question"]
