@@ -218,6 +218,7 @@ function App() {
           )}
 
           <SessionHistory session={session} />
+          <Dashboard />
         </>
       )}
     </div>
