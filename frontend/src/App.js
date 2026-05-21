@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   const [userEmail, setUserEmail] = useState("");
