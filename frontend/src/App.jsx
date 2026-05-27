@@ -7,6 +7,7 @@ import Instructions from "./components/Instructions";
 import QuestionSection from "./components/QuestionSection";
 import SessionHistory from "./components/SessionHistory";
 import LogoutButton from "./components/LogoutButton";
+import Dashboard from "./components/Dashboard";
 
 import {
   fetchQuestionApi,
@@ -107,7 +108,7 @@ function App() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [timeLeft, timerActive]);
+  }, [timeLeft, timerActive, answer]);
 
   const handleRetry = () => {
     if (attempts >= 2) {
@@ -218,7 +219,7 @@ function App() {
           )}
 
           <SessionHistory session={session} />
-          <Dashboard />
+          
         </>
       )}
     </div>
