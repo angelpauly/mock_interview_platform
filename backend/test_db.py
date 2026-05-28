@@ -1,3 +1,7 @@
-from app.core.database import db
+from app.core.database import questions_collection
 
-print(db.list_collection_names())
+questions = list(
+    questions_collection.find()
+)
+
+print(len(questions))
