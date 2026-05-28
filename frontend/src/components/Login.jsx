@@ -1,11 +1,9 @@
 import { useState } from "react";
 
-function Login({ setIsLoggedIn }) {
+function Login() {
 
     const [email, setEmail] = useState("");
-
     const [password, setPassword] = useState("");
-
 
     const handleLogin = async () => {
 
@@ -29,17 +27,16 @@ function Login({ setIsLoggedIn }) {
 
             const data = await res.json();
 
+            console.log(data);
+
             if (data.access_token) {
 
-                // Save JWT token
                 localStorage.setItem(
                     "token",
                     data.access_token
                 );
 
-                setIsLoggedIn(true);
-
-                alert("Login successful");
+                window.location.href = "/home";
 
             } else {
 
@@ -50,46 +47,45 @@ function Login({ setIsLoggedIn }) {
 
             console.log(error);
 
-            alert("Server error");
+            alert("Server Error");
         }
     };
 
-
     return (
 
-        <div>
+        <div className="flex flex-col">
 
-            <h2>Login</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center">
+                Login
+            </h2>
 
             <input
                 type="email"
                 placeholder="Enter Email"
 
-                value={email}
+                className="border p-3 rounded mb-4"
 
                 onChange={(e) =>
                     setEmail(e.target.value)
                 }
             />
 
-            <br />
-            <br />
-
             <input
                 type="password"
                 placeholder="Enter Password"
 
-                value={password}
+                className="border p-3 rounded mb-4"
 
                 onChange={(e) =>
                     setPassword(e.target.value)
                 }
             />
 
-            <br />
-            <br />
+            <button
+                onClick={handleLogin}
 
-            <button onClick={handleLogin}>
+                className="bg-blue-500 text-white py-3 rounded"
+            >
                 Login
             </button>
 
