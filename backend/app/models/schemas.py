@@ -17,3 +17,11 @@ class UserSignup(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+class HistoryRequest(BaseModel):
+
+    user_email: str
+    question: str
+    answer: str
+    score: int
+    feedback: str
