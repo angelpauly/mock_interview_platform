@@ -3,9 +3,7 @@ import { useState } from "react";
 function Signup() {
 
     const [email, setEmail] = useState("");
-
     const [password, setPassword] = useState("");
-
 
     const handleSignup = async () => {
 
@@ -29,13 +27,11 @@ function Signup() {
 
             const data = await res.json();
 
-            if (res.ok) {
+            console.log(data);
 
-                alert(data.message);
+            if (res.status === 200) {
 
-                setEmail("");
-
-                setPassword("");
+                alert("Signup Successful");
 
             } else {
 
@@ -46,46 +42,45 @@ function Signup() {
 
             console.log(error);
 
-            alert("Server error");
+            alert("Server Error");
         }
     };
 
-
     return (
 
-        <div>
+        <div className="flex flex-col">
 
-            <h2>Signup</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center">
+                Signup
+            </h2>
 
             <input
                 type="email"
                 placeholder="Enter Email"
 
-                value={email}
+                className="border p-3 rounded mb-4"
 
                 onChange={(e) =>
                     setEmail(e.target.value)
                 }
             />
 
-            <br />
-            <br />
-
             <input
                 type="password"
                 placeholder="Enter Password"
 
-                value={password}
+                className="border p-3 rounded mb-4"
 
                 onChange={(e) =>
                     setPassword(e.target.value)
                 }
             />
 
-            <br />
-            <br />
+            <button
+                onClick={handleSignup}
 
-            <button onClick={handleSignup}>
+                className="bg-green-500 text-white py-3 rounded"
+            >
                 Signup
             </button>
 
