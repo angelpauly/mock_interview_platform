@@ -170,6 +170,35 @@ function Interview() {
         setScore(data.score);
 
         setFeedback(data.feedback);
+        const token = localStorage.getItem("token");
+
+const payload = JSON.parse(
+    atob(token.split(".")[1])
+);
+
+await fetch(
+    "http://127.0.0.1:8000/save-history",
+    {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+            user_email: payload.sub,
+
+            question: question,
+
+            answer: answer,
+
+            score: data.score,
+
+            feedback: data.feedback
+        })
+    }
+);
 
         setSession((prev) => [
 
@@ -294,9 +323,7 @@ function Interview() {
 
                             <div className="mt-20">
 
-                                <SessionHistory
-                                    session={session}
-                                />
+                                
 
                             </div>
 

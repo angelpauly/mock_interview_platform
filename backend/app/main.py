@@ -6,7 +6,8 @@ from app.routes import (
     auth,
     interview,
     evaluation,
-    dashboard
+    dashboard,
+    history
 )
 
 app = FastAPI()
@@ -34,3 +35,5 @@ app.include_router(interview.router)
 app.include_router(evaluation.router)
 
 app.include_router(dashboard.router)
+
+app.include_router(history.router)
